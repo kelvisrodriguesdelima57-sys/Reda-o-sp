@@ -1,99 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Responder Atividades com Oneko Neko</title>
-<style>
-  body {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site de Respostas</title>
+  <style>
+    body {
       margin: 0;
-          font-family: Arial, sans-serif;
-              background: #f0f0f0;
-                  overflow-x: hidden;
-                      height: 100vh;
-                          position: relative;
-                            }
-                              #container {
-                                  background: #fff;
-                                      padding: 20px;
-                                          border-radius: 10px;
-                                              box-shadow: 0 0 10px rgba(0,0,0,0.2);
-                                                  width: 400px;
-                                                      margin: 50px auto;
-                                                          position: relative;
-                                                              z-index: 1;
-                                                                }
-                                                                  textarea, button {
-                                                                      width: 100%;
-                                                                          padding: 10px;
-                                                                              margin-top: 10px;
-                                                                                }
-                                                                                  #resposta {
-                                                                                      margin-top: 20px;
-                                                                                          padding: 10px;
-                                                                                              background: #e0e0e0;
-                                                                                                  border-radius: 5px;
-                                                                                                      min-height: 50px;
-                                                                                                        }
-                                                                                                          #oneko {
-                                                                                                              position: absolute;
-                                                                                                                  width: 80px;
-                                                                                                                      height: 80px;
-                                                                                                                          pointer-events: none;
-                                                                                                                              z-index: 2;
-                                                                                                                                }
-                                                                                                                                </style>
-                                                                                                                                </head>
-                                                                                                                                <body>
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #0077cc;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
 
-                                                                                                                                <div id="container">
-                                                                                                                                  <h2>Responder sua atividade</h2>
-                                                                                                                                    <label for="questao">Cole aqui a questão da atividade:</label>
-                                                                                                                                      <textarea id="questao" rows="5" placeholder="Cole a questão aqui..."></textarea>
-                                                                                                                                        <label for="alternativas">Cole aqui as alternativas:</label>
-                                                                                                                                          <textarea id="alternativas" rows="5" placeholder="A) ... B) ... C) ... D) ..."></textarea>
-                                                                                                                                            <button onclick="responder()">Gerar Resposta</button>
-                                                                                                                                              <div id="resposta"></div>
-                                                                                                                                              </div>
+  <div class="container">
+    <h1>🐱 Site de Respostas</h1>
+    <p>Cole aqui sua questão e veja as respostas!</p>
+    <textarea rows="5" style="width:100%;"></textarea>
+    <br><br>
+    <button>Enviar</button>
+  </div>
 
-                                                                                                                                              <img id="oneko" src="https://raw.githubusercontent.com/pass-with-high-score/ANeko/master/fastlane/metadata/android/en-US/images/icon.png" alt="Oneko Neko">
+  <!-- Script do Blue Tapy -->
+  <script>
+  class BlueTapy {
+    constructor() {
+      this.el = document.createElement("img");
+      this.el.src = "blue-tapy/mati1.png"; // sprite inicial
+      this.el.style.position = "fixed";
+      this.el.style.left = "100px";
+      this.el.style.top = "100px";
+      this.el.style.width = "64px";
+      this.el.style.height = "64px";
+      this.el.style.pointerEvents = "none";
+      document.body.appendChild(this.el);
 
-                                                                                                                                              <script>
-                                                                                                                                              function responder() {
-                                                                                                                                                const questao = document.getElementById('questao').value;
-                                                                                                                                                  const alternativas = document.getElementById('alternativas').value;
-                                                                                                                                                    let resposta = '';
+      this.frames = {
+        up: ["blue-tapy/up1.png", "blue-tapy/up2.png"],
+        down: ["blue-tapy/down1.png", "blue-tapy/down2.png"],
+        left: ["blue-tapy/left1.png", "blue-tapy/left2.png"],
+        right: ["blue-tapy/right1.png", "blue-tapy/right2.png"],
+        idle: ["blue-tapy/mati1.png", "blue-tapy/mati2.png"],
+      };
 
-                                                                                                                                                      if(!questao) {
-                                                                                                                                                          resposta = 'Por favor, cole a questão primeiro!';
-                                                                                                                                                            } else if(!alternativas) {
-                                                                                                                                                                resposta = 'Por favor, cole as alternativas!';
-                                                                                                                                                                  } else {
-                                                                                                                                                                      resposta = 'Questão: ' + questao + '\nAlternativas: ' + alternativas + '\nResposta sugerida: [Aqui vai a resposta]';
-                                                                                                                                                                        }
+      this.frameIndex = 0;
+      this.x = 100;
+      this.y = 100;
 
-                                                                                                                                                                          document.getElementById('resposta').innerText = resposta;
-                                                                                                                                                                          }
+      this.mouseX = window.innerWidth / 2;
+      this.mouseY = window.innerHeight / 2;
 
-                                                                                                                                                                          const oneko = document.getElementById('oneko');
-                                                                                                                                                                          let mouseX = 0, mouseY = 0;
-                                                                                                                                                                          let posX = 100, posY = 100;
+      document.addEventListener("mousemove", e => {
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+      });
 
-                                                                                                                                                                          document.addEventListener('mousemove', e => {
-                                                                                                                                                                            mouseX = e.clientX;
-                                                                                                                                                                              mouseY = e.clientY;
-                                                                                                                                                                              });
+      setInterval(() => this.update(), 120);
+    }
 
-                                                                                                                                                                              function moveOneko() {
-                                                                                                                                                                                posX += (mouseX - posX - 40) * 0.1;
-                                                                                                                                                                                  posY += (mouseY - posY - 40) * 0.1;
-                                                                                                                                                                                    oneko.style.left = posX + 'px';
-                                                                                                                                                                                      oneko.style.top = posY + 'px';
-                                                                                                                                                                                        requestAnimationFrame(moveOneko);
-                                                                                                                                                                                        }
+    update() {
+      let dx = this.mouseX - this.x;
+      let dy = this.mouseY - this.y;
+      let dir = "idle";
 
-                                                                                                                                                                                        moveOneko();
-                                                                                                                                                                                        </script>
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          dir = dx > 0 ? "right" : "left";
+          this.x += dx > 0 ? 5 : -5;
+        } else {
+          dir = dy > 0 ? "down" : "up";
+          this.y += dy > 0 ? 5 : -5;
+        }
+      }
 
-                                                                                                                                                                                        </body>
-                                                                                                                                                                                        </html>
+      this.frameIndex = (this.frameIndex + 1) % this.frames[dir].length;
+      this.el.src = this.frames[dir][this.frameIndex];
+      this.el.style.left = this.x + "px";
+      this.el.style.top = this.y + "px";
+    }
+  }
+
+  window.onload = () => new BlueTapy();
+  </script>
+
+</body>
+</html>
