@@ -3,100 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site de Respostas</title>
+  <title>Gerador de Redação - Gemini</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f4f9;
-      color: #333;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #4285F4;
+      color: white;
       text-align: center;
-      padding: 50px;
+      padding: 1rem;
     }
-    h1 {
-      color: #0077cc;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
+
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    input, button {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #4285F4;
+      color: white;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #3367D6;
+    }
+
+    #resultado {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      min-height: 150px;
+      white-space: pre-line;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Gerador de Redação - Gemini</h1>
+  </header>
 
-  <div class="container">
-    <h1>🐱 Site de Respostas</h1>
-    <p>Cole aqui sua questão e veja as respostas!</p>
-    <textarea rows="5" style="width:100%;"></textarea>
-    <br><br>
-    <button>Enviar</button>
-  </div>
+  <main>
+    <label for="tema">Digite o tema da redação:</label>
+    <input type="text" id="tema" placeholder="Ex: O impacto da tecnologia na educação">
 
-  <!-- Script do Blue Tapy -->
+    <button onclick="gerarRedacao()">Gerar Redação</button>
+
+    <h2>Resultado:</h2>
+    <div id="resultado">Sua redação aparecerá aqui...</div>
+  </main>
+
   <script>
-  class BlueTapy {
-    constructor() {
-      this.el = document.createElement("img");
-      this.el.src = "blue-tapy/mati1.png"; // sprite inicial
-      this.el.style.position = "fixed";
-      this.el.style.left = "100px";
-      this.el.style.top = "100px";
-      this.el.style.width = "64px";
-      this.el.style.height = "64px";
-      this.el.style.pointerEvents = "none";
-      document.body.appendChild(this.el);
+    async function gerarRedacao() {
+      const tema = document.getElementById("tema").value;
+      const resultado = document.getElementById("resultado");
 
-      this.frames = {
-        up: ["blue-tapy/up1.png", "blue-tapy/up2.png"],
-        down: ["blue-tapy/down1.png", "blue-tapy/down2.png"],
-        left: ["blue-tapy/left1.png", "blue-tapy/left2.png"],
-        right: ["blue-tapy/right1.png", "blue-tapy/right2.png"],
-        idle: ["blue-tapy/mati1.png", "blue-tapy/mati2.png"],
-      };
-
-      this.frameIndex = 0;
-      this.x = 100;
-      this.y = 100;
-
-      this.mouseX = window.innerWidth / 2;
-      this.mouseY = window.innerHeight / 2;
-
-      document.addEventListener("mousemove", e => {
-        this.mouseX = e.clientX;
-        this.mouseY = e.clientY;
-      });
-
-      setInterval(() => this.update(), 120);
-    }
-
-    update() {
-      let dx = this.mouseX - this.x;
-      let dy = this.mouseY - this.y;
-      let dir = "idle";
-
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          dir = dx > 0 ? "right" : "left";
-          this.x += dx > 0 ? 5 : -5;
-        } else {
-          dir = dy > 0 ? "down" : "up";
-          this.y += dy > 0 ? 5 : -5;
-        }
+      if (!tema) {
+        resultado.textContent = "⚠️ Por favor, digite um tema.";
+        return;
       }
 
-      this.frameIndex = (this.frameIndex + 1) % this.frames[dir].length;
-      this.el.src = this.frames[dir][this.frameIndex];
-      this.el.style.left = this.x + "px";
-      this.el.style.top = this.y + "px";
+      resultado.textContent = "✍️ Gerando redação com Gemini sobre: " + tema + "...";
+
+      try {
+        const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=SUA_CHAVE_GEMINI", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `Escreva uma redação dissertativa no estilo ENEM sobre o tema: ${tema}`
+              }]
+            }]
+          })
+        });
+
+        const data = await resp.json();
+        resultado.textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Erro: não veio resposta.";
+      } catch (e) {
+        resultado.textContent = "❌ Erro ao gerar redação: " + e.message;
+      }
     }
-  }
-
-  window.onload = () => new BlueTapy();
   </script>
-
 </body>
 </html>
