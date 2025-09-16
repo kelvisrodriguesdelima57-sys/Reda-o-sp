@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de Redação - Gemini</title>
+  <title>Redação Turbo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -63,11 +63,26 @@
       min-height: 150px;
       white-space: pre-line;
     }
+
+    .btn-small {
+      width: auto;
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+      color: #555;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Gerador de Redação - Gemini</h1>
+    <h1>Redação Turbo</h1>
   </header>
 
   <main>
@@ -78,7 +93,16 @@
 
     <h2>Resultado:</h2>
     <div id="resultado">Sua redação aparecerá aqui...</div>
+
+    <div>
+      <button class="btn-small" onclick="copiarRedacao()">📋 Copiar Redação</button>
+      <button class="btn-small" onclick="limparRedacao()">🗑️ Limpar Redação</button>
+    </div>
   </main>
+
+  <footer>
+    Desenvolvido por Kelvis Rodrigues
+  </footer>
 
   <script>
     async function gerarRedacao() {
@@ -90,7 +114,7 @@
         return;
       }
 
-      resultado.textContent = "✍️ Gerando redação com Gemini sobre: " + tema + "...";
+      resultado.textContent = "✍️ Gerando redação sobre: " + tema + "...";
 
       try {
         const resp = await fetch("/api/generate-essay", {
@@ -111,6 +135,19 @@
       } catch (e) {
         resultado.textContent = "❌ Erro ao gerar redação: " + e.message;
       }
+    }
+
+    function copiarRedacao() {
+      const resultado = document.getElementById("resultado").textContent;
+      if (!resultado || resultado === "Sua redação aparecerá aqui...") return;
+      navigator.clipboard.writeText(resultado)
+        .then(() => alert("✅ Redação copiada!"))
+        .catch(() => alert("❌ Falha ao copiar redação."));
+    }
+
+    function limparRedacao() {
+      document.getElementById("resultado").textContent = "Sua redação aparecerá aqui...";
+      document.getElementById("tema").value = "";
     }
   </script>
 </body>
