@@ -93,22 +93,21 @@
       resultado.textContent = "✍️ Gerando redação com Gemini sobre: " + tema + "...";
 
       try {
-        const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=SUA_CHAVE_GEMINI", {
+        const resp = await fetch("/api/generate-essay", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `Escreva uma redação dissertativa no estilo ENEM sobre o tema: ${tema}`
-              }]
-            }]
-          })
+          body: JSON.stringify({ tema })
         });
 
         const data = await resp.json();
-        resultado.textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Erro: não veio resposta.";
+        
+        if (resp.ok && data.text) {
+          resultado.textContent = data.text;
+        } else {
+          resultado.textContent = "⚠️ Erro: " + (data.error || "não foi possível gerar a redação.");
+        }
       } catch (e) {
         resultado.textContent = "❌ Erro ao gerar redação: " + e.message;
       }
